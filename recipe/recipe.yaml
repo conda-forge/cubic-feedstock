@@ -12,7 +12,7 @@ source:
   sha256: 184317a8db18cc7da35266ba4f81ede390c4c52f167c2a4578c40a374d6111b1
 
 build:
-  number: 1
+  number: 2
   script:
     env:
       CARGO_PROFILE_RELEASE_LTO: fat
@@ -23,9 +23,9 @@ build:
           - cargo auditable install --locked --no-track --bins --features=${{ extra_features }} --root="$PREFIX" --path .
           # generate shell completions
           - mkdir -p "$PREFIX"/share/bash-completion/completions "$PREFIX"/share/fish/vendor_completions.d "$PREFIX"/share/zsh/site-functions
-          - '"$PREFIX"/bin/cubic completions bash > "$PREFIX"/share/bash-completion/completions/cubic'
-          - '"$PREFIX"/bin/cubic completions fish > "$PREFIX"/share/fish/vendor_completions.d/cubic.fish'
-          - '"$PREFIX"/bin/cubic completions zsh  > "$PREFIX"/share/zsh/site-functions/_cubic'
+          - 'XDG_RUNTIME_DIR=/tmp/runtime "$PREFIX"/bin/cubic completions bash > "$PREFIX"/share/bash-completion/completions/cubic'
+          - 'XDG_RUNTIME_DIR=/tmp/runtime "$PREFIX"/bin/cubic completions fish > "$PREFIX"/share/fish/vendor_completions.d/cubic.fish'
+          - 'XDG_RUNTIME_DIR=/tmp/runtime "$PREFIX"/bin/cubic completions zsh  > "$PREFIX"/share/zsh/site-functions/_cubic'
       - if: win
         then:
           - cargo auditable install --locked --no-track --bins --features=${{ extra_features }} --root="%LIBRARY_PREFIX%" --path .
