@@ -1,0 +1,87 @@
+context:
+  version: "0.21.0"
+  # NOTE: The `qemu-sandbox` feature makes Cubic pass the `-sandbox on` flag to the `qemu-system-*` executable, which in turn enables the Seccomp mode 2 system call filter (cf. https://www.qemu.org/docs/master/system/qemu-manpage.html) that is a Linux-only technology. Usually, `qemu-system-*` Linux distribution packages (incl. Debian, Fedora, openSUSE, Ubuntu) are built with sandbox support, so we enable the feature for Linux.
+  extra_features: ${{ "qemu-sandbox" if linux else "" }}
+
+package:
+  name: cubic
+  version: ${{ version }}
+
+source:
+  url: https://github.com/cubic-vm/cubic/archive/refs/tags/v${{ version }}.tar.gz
+  sha256: 184317a8db18cc7da35266ba4f81ede390c4c52f167c2a4578c40a374d6111b1
+
+build:
+  number: 0
+  script:
+    env:
+      CARGO_PROFILE_RELEASE_LTO: fat
+      CARGO_PROFILE_RELEASE_STRIP: symbols
+    content:
+      - if: unix
+        then:
+          - cargo auditable install --locked --no-track --bins --features=${{ extra_features }} --root="$PREFIX" --path .
+          # generate shell completions
+          - mkdir -p "$PREFIX"/share/bash-completion/completions "$PREFIX"/share/fish/vendor_completions.d "$PREFIX"/share/zsh/site-functions
+          - '"$PREFIX"/bin/cubic completions bash > "$PREFIX"/share/bash-completion/completions/cubic'
+          - '"$PREFIX"/bin/cubic completions fish > "$PREFIX"/share/fish/vendor_completions.d/cubic.fish'
+          - '"$PREFIX"/bin/cubic completions zsh  > "$PREFIX"/share/zsh/site-functions/_cubic'
+      - if: win
+        then:
+          - cargo auditable install --locked --no-track --bins --features=${{ extra_features }} --root="%LIBRARY_PREFIX%" --path .
+          # generate shell completions
+          - mkdir "%LIBRARY_PREFIX%\share\bash-completion\completions"
+          - mkdir "%LIBRARY_PREFIX%\share\fish\vendor_completions.d"
+          - mkdir "%LIBRARY_PREFIX%\share\zsh\site-functions"
+          - '"%LIBRARY_BIN%"\cubic.exe completions bash > "%LIBRARY_PREFIX%"\share\bash-completion\completions\cubic'
+          - '"%LIBRARY_BIN%"\cubic.exe completions fish > "%LIBRARY_PREFIX%"\share\fish\vendor_completions.d\cubic.fish'
+          - '"%LIBRARY_BIN%"\cubic.exe completions zsh  > "%LIBRARY_PREFIX%"\share\zsh\site-functions\_cubic'
+      - cargo-bundle-licenses --format yaml --output ./THIRDPARTY.yml
+
+requirements:
+  build:
+    - ${{ stdlib('c') }}
+    - ${{ compiler('c') }}
+    - ${{ compiler('rust') }}
+    - cargo-auditable
+    - cargo-bundle-licenses
+    - if: win
+      then: nasm
+
+tests:
+  - script:
+      - cubic --help
+      - cubic --version
+  - package_contents:
+      bin:
+        - cubic
+      files:
+        - if: unix
+          then:
+            - share/bash-completion/completions/cubic
+            - share/fish/vendor_completions.d/cubic.fish
+            - share/zsh/site-functions/_cubic
+        - if: win
+          then:
+            - Library/share/bash-completion/completions/cubic
+            - Library/share/fish/vendor_completions.d/cubic.fish
+            - Library/share/zsh/site-functions/_cubic
+      strict: true
+
+about:
+  summary: A lightweight command line manager for virtual machines
+  description: |
+    Cubic is a lightweight command line manager for virtual machines. It has a
+    simple, daemonless and rootless design. All Cubic virtual machines run isolated
+    in the user context. Cubic is built on top of QEMU, KVM and cloud-init.
+  license: MIT OR Apache-2.0
+  license_file:
+    - LICENSE-APACHE
+    - LICENSE-MIT
+    - THIRDPARTY.yml
+  homepage: https://cubic-vm.org
+  repository: https://github.com/cubic-vm/cubic
+
+extra:
+  recipe-maintainers:
+    - salim-b
