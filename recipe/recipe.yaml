@@ -12,7 +12,7 @@ source:
   sha256: 184317a8db18cc7da35266ba4f81ede390c4c52f167c2a4578c40a374d6111b1
 
 build:
-  number: 0
+  number: 1
   script:
     env:
       CARGO_PROFILE_RELEASE_LTO: fat

@@ -8,3 +8,8 @@ conda_install_tool: pixi
 github:
   branch_name: main
   tooling_branch_name: main
+provider:
+  linux_aarch64: default
+  linux_ppc64le: default
+  osx_arm64: default
+  win_arm64: default
