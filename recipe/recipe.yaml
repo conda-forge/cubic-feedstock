@@ -1,5 +1,5 @@
 context:
-  version: "0.21.0"
+  version: "0.22.0"
   # NOTE: The `qemu-sandbox` feature makes Cubic pass the `-sandbox on` flag to the `qemu-system-*` executable, which in turn enables the Seccomp mode 2 system call filter (cf. https://www.qemu.org/docs/master/system/qemu-manpage.html) that is a Linux-only technology. Usually, `qemu-system-*` Linux distribution packages (incl. Debian, Fedora, openSUSE, Ubuntu) are built with sandbox support, so we enable the feature for Linux.
   extra_features: ${{ "qemu-sandbox" if linux else "" }}
 
@@ -9,10 +9,10 @@ package:
 
 source:
   url: https://github.com/cubic-vm/cubic/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: 184317a8db18cc7da35266ba4f81ede390c4c52f167c2a4578c40a374d6111b1
+  sha256: 6bff97fe45810f7175d598acfd380be3c32cf60f0aa08f0bd902de47edf0e4b8
 
 build:
-  number: 2
+  number: 0
   script:
     env:
       CARGO_PROFILE_RELEASE_LTO: fat
