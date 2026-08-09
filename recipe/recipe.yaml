@@ -1,7 +1,5 @@
 context:
   version: "0.25.0"
-  # NOTE: The `qemu-sandbox` feature makes Cubic pass the `-sandbox on` flag to the `qemu-system-*` executable, which in turn enables the Seccomp mode 2 system call filter (cf. https://www.qemu.org/docs/master/system/qemu-manpage.html) that is a Linux-only technology. Usually, `qemu-system-*` Linux distribution packages (incl. Debian, Fedora, openSUSE, Ubuntu) are built with sandbox support, so we enable the feature for Linux.
-  extra_features: ${{ "qemu-sandbox" if linux else "" }}
 
 package:
   name: cubic
@@ -21,7 +19,7 @@ build:
     content:
       - if: unix
         then:
-          - cargo auditable install --path=. --root="$PREFIX" --no-track --locked --bins --features=${{ extra_features }}
+          - cargo auditable install --path=. --root="$PREFIX" --no-track --locked --bins
           # generate shell completions
           - if: build_platform == host_platform
             then:
@@ -31,7 +29,7 @@ build:
               - 'XDG_RUNTIME_DIR=/tmp/runtime "$PREFIX"/bin/cubic completions zsh  > "$PREFIX"/share/zsh/site-functions/_cubic'
       - if: win
         then:
-          - cargo auditable install --path=. --root="%LIBRARY_PREFIX%" --no-track --locked --bins --features=${{ extra_features }}
+          - cargo auditable install --path=. --root="%LIBRARY_PREFIX%" --no-track --locked --bins
           # generate shell completions
           - if: build_platform == host_platform
             then:
