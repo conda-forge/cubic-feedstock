@@ -54,6 +54,7 @@ tests:
   - package_contents:
       bin:
         - cubic
+        - cubic-generate-image-list
       files:
         - if: unix and build_platform == host_platform
           then:
