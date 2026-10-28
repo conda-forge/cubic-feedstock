@@ -13,26 +13,24 @@ build:
   number: 0
   script:
     env:
-      AWS_LC_SYS_CMAKE_BUILDER: ${{ 1 if win else 0 }} # force CMake builder for `aws-lc-sys` native C/C++ code on Windows
+      AWS_LC_SYS_CMAKE_BUILDER: ${{ "1" if win else "" }} # force CMake builder for `aws-lc-sys` native C/C++ code on Windows
       CARGO_PROFILE_RELEASE_LTO: fat
       CARGO_PROFILE_RELEASE_STRIP: symbols
     interpreter: nu
     content:
       - let prefix = $env.LIBRARY_PREFIX? | default $env.PREFIX
       # build main app and generate license data
-      - cargo auditable install --path=. --root=($prefix) --no-track --locked --bins
-      - cargo-bundle-licenses --format=yaml --output=THIRDPARTY.yml
+      - ^cargo auditable install --path=. --root=($prefix) --no-track --locked --bins
+      - ^cargo-bundle-licenses --format=yaml --output=THIRDPARTY.yml
       # generate shell completions
       - if: build_platform == host_platform
         then:
-          - mkdir ($prefix)/share/bash-completion/completions ($prefix)/share/fish/vendor_completions.d ($prefix)/share/zsh/site-functions
-          - let bin = ($prefix)/bin/cubic
           # `XDG_RUNTIME_DIR` must be set (to a writable directory) when running `cubic` on Linux (setting `UID` would require `/run/user/<UID>` being *writable* which it is not in containerized builds)
           - if: linux
             then: $env.XDG_RUNTIME_DIR = $env.XDG_RUNTIME_DIR? | default ($env.HOME)/.cache
-          - ^$bin completions bash | save ($prefix)/share/bash-completion/completions/cubic
-          - ^$bin completions fish | save ($prefix)/share/fish/vendor_completions.d/cubic.fish
-          - ^$bin completions zsh  | save ($prefix)/share/zsh/site-functions/_cubic
+          - ^cubic completions bash | save --force ($prefix)/share/bash-completion/completions/cubic
+          - ^cubic completions fish | save --force ($prefix)/share/fish/vendor_completions.d/cubic.fish
+          - ^cubic completions zsh  | save --force ($prefix)/share/zsh/site-functions/_cubic
 
 requirements:
   build:
