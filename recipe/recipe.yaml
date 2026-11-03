@@ -1,5 +1,5 @@
 context:
-  version: "0.27.0"
+  version: "0.27.1"
 
 package:
   name: cubic
@@ -7,7 +7,7 @@ package:
 
 source:
   url: https://github.com/cubic-vm/cubic/archive/refs/tags/v${{ version }}.tar.gz
-  sha256: d03c9dbdebb1dcdabc6b62d450ef5a6eb3fa9ae85a9af8b9a3fb8fbf13a36ea5
+  sha256: e439538e9f7be9288e51277610ddefe3725ea9b5e8f048645a111a04bd9a5061
 
 build:
   number: 0
